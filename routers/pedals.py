@@ -89,7 +89,7 @@ fake_pedal_db: list[Pedal] = [
 
 @router.get("/")
 async def get_pedals():
-    return {"pedals": fake_pedal_db}
+    return {"data": fake_pedal_db}
 
 
 @router.get("/{pedal_id}")
@@ -99,7 +99,7 @@ async def get_pedal(
     pedal = next((item for item in fake_pedal_db if item.id == pedal_id), None)
     if pedal is None:
         return {"error": "Pedal not found"}
-    return {"pedal": pedal}
+    return {"data": pedal}
 
 
 @router.post("/")
@@ -113,7 +113,7 @@ async def create_pedal(pedal_data: Annotated[PedalCreate, Body()]):
         **pedal_data.model_dump(),
     )
     fake_pedal_db.append(new_pedal)
-    return {"pedal": new_pedal}
+    return {"data": new_pedal}
 
 
 @router.delete("/{pedal_id}")
@@ -124,7 +124,7 @@ async def delete_pedal(
     if pedal is None:
         return {"error": "Pedal not found"}
     fake_pedal_db.remove(pedal)
-    return {"message": "Pedal deleted successfully"}
+    return {"data": {"message": "Pedal deleted successfully"}}
 
 
 @router.patch("/{pedal_id}")
@@ -166,4 +166,4 @@ async def update_pedal(
     # fake_pedal_db[pedal_index] = updated_pedal
     # return {"pedal": updated_pedal}
 
-    return {"pedal": pedal_to_update}
+    return {"data": pedal_to_update}
