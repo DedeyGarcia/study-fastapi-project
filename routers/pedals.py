@@ -1,6 +1,6 @@
 from typing import Annotated
 from datetime import date, datetime, timezone
-from fastapi import APIRouter, Body, Path
+from fastapi import APIRouter, Body, Path, HTTPException
 from pydantic import BaseModel
 from enum import Enum
 
@@ -89,7 +89,7 @@ fake_pedal_db: list[Pedal] = [
 
 @router.get("/")
 async def get_pedals():
-    return {"pedal": fake_pedal_db}
+    return {"data": fake_pedal_db}
 
 
 @router.get("/{pedal_id}")
@@ -98,7 +98,7 @@ async def get_pedal(
 ):
     pedal = next((item for item in fake_pedal_db if item.id == pedal_id), None)
     if pedal is None:
-        return {"error": "Pedal not found"}
+        raise HTTPException(status_code=404, detail="Pedal not found")
     return pedal
 
 
@@ -122,7 +122,7 @@ async def delete_pedal(
 ):
     pedal = next((item for item in fake_pedal_db if item.id == pedal_id), None)
     if pedal is None:
-        return {"error": "Pedal not found"}
+        raise HTTPException(status_code=404, detail="Pedal not found")
     fake_pedal_db.remove(pedal)
     return {"message": "Pedal deleted successfully"}
 
@@ -137,7 +137,7 @@ async def update_pedal(
     )
 
     if pedal_to_update is None:
-        return {"error": "Pedal not found"}
+        raise HTTPException(status_code=404, detail="Pedal not found")
 
     # Change the update strategy from this point down.
     update_data = data_to_be_patched.model_dump(exclude_unset=True)
