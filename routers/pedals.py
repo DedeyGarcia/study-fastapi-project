@@ -111,7 +111,7 @@ fake_pedal_db: list[Pedal] = [
 ]
 
 
-@router.get("/", response_model=PedalListResponse)
+@router.get("/")
 async def get_pedals():
     return {"data": fake_pedal_db}
 
