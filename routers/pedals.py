@@ -112,52 +112,58 @@ fake_pedal_db: list[Pedal] = [
 
 
 @router.get("/", response_model=PedalListResponse)
-async def get_pedals(
-    page: Annotated[int, Query(title="The page number to retrieve", ge=1)] = 1,
-    page_size: Annotated[
-        int, Query(title="The number of items per page", ge=1, le=50)
-    ] = 10,
-    sort_by: Annotated[
-        Literal["name", "brand", "type", "price"] | None,
-        Query(),
-    ] = None,
-    order: Annotated[Literal["asc", "desc"], Query()] = None,
-):
-    pedals = fake_pedal_db
+async def get_pedals():
+    return {"data": fake_pedal_db}
 
-    if sort_by is not None:
-        if order is None:
-            raise HTTPException(
-                status_code=400,
-                detail="order can only be used when sort_by is provided",
-            )
-        sort_options = {
-            "name": lambda pedal: pedal.name,
-            "brand": lambda pedal: pedal.brand,
-            "type": lambda pedal: pedal.type,
-            "price": lambda pedal: pedal.price,
-        }
 
-        pedals = sorted(
-            pedals,
-            key=sort_options[sort_by],
-            reverse=(order == "desc"),
-        )
+# Paginated Version Option
+# async def get_pedals(
+#     page: Annotated[int, Query(title="The page number to retrieve", ge=1)] = 1,
+#     page_size: Annotated[
+#         int, Query(title="The number of items per page", ge=1, le=50)
+#     ] = 10,
+#     sort_by: Annotated[
+#         Literal["name", "brand", "type", "price"] | None,
+#         Query(),
+#     ] = None,
+#     order: Annotated[Literal["asc", "desc"], Query()] = None,
+# ):
+#     pedals = fake_pedal_db
 
-    total_items = len(pedals)
-    start_index = (page - 1) * page_size
-    end_index = start_index + page_size
-    paginated_pedals = pedals[start_index:end_index]
-    total_pages = ceil(total_items / page_size)
-    return {
-        "data": paginated_pedals,
-        "metadata": {
-            "page": page,
-            "page_size": page_size,
-            "total_items": total_items,
-            "total_pages": total_pages,
-        },
-    }
+#     if sort_by is not None:
+#         if order is None:
+#             raise HTTPException(
+#                 status_code=400,
+#                 detail="order can only be used when sort_by is provided",
+#             )
+
+#         sort_options = {
+#             "name": lambda pedal: pedal.name,
+#             "brand": lambda pedal: pedal.brand,
+#             "type": lambda pedal: pedal.type,
+#             "price": lambda pedal: pedal.price,
+#         }
+
+#         pedals = sorted(
+#             pedals,
+#             key=sort_options[sort_by],
+#             reverse=(order == "desc"),
+#         )
+
+#     total_items = len(pedals)
+#     start_index = (page - 1) * page_size
+#     end_index = start_index + page_size
+#     paginated_pedals = pedals[start_index:end_index]
+#     total_pages = ceil(total_items / page_size)
+#     return {
+#         "data": paginated_pedals,
+#         "metadata": {
+#             "page": page,
+#             "page_size": page_size,
+#             "total_items": total_items,
+#             "total_pages": total_pages,
+#         },
+#     }
 
 
 @router.get("/{pedal_id}")
